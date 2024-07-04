@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Application</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        table {
+            margin: 0 auto;
+            border: 2px solid darkorchid;
+        }
+
+        td {
+            text-align: center;
+            border: 2px solid deepskyblue;
+            text-align: center;
+        }
+
+        .font {
+            font-size: 18px;
+        }
+
+        .center {
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        input {
+            padding: 2px 50px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .font {
+            font-size: 24px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .buttons {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+    <!-- Include jsPDF library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+    <table>
+        <tr>
+            <td colspan="3" class="font">Bill Maker</td>
+        </tr>
+
+        <tr>
+            <td><label for="rotary">Rotary</label></td>
+            <td><input type="text" id="rotary" placeholder="Enter time in hours" autofocus></td>
+            <td><input type="text" id="rotaryy" placeholder="Enter time in minutes"></td>
+        </tr>
+        <tr>
+            <td><label for="thresher">thresher</label></td>
+            <td><input type="text" id="thresher" placeholder="Enter time in hours"></td>
+            <td><input type="text" id="thresherr" placeholder="Enter time in minutes"></td>
+        </tr>
+        <tr>
+            <td><label for="kalti">Kalti</label></td>
+            <td><input type="text" id="kalti" placeholder="Enter time in hours"></td>
+            <td><input type="text" id="kaltii" placeholder="Enter time in minutes"></td>
+        </tr>
+
+        <tr>
+            <td colspan="3" class="center">
+                <button onclick="calculateBill()">Get Bill</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3"><input type="text" id="totelbill" placeholder="Your total bill is" readonly></td>
+        </tr>
+        <tr>
+            <td colspan="3"><input type="text" id="username" placeholder="Enter user name"></td>
+        </tr>
+    </table>
+
+    <div class="buttons hidden" id="additionalButtons">
+        <button onclick="getPDF()">Get PDF</button>
+        <button onclick="shareOnWhatsApp()">Share on WhatsApp</button>
+    </div>
+
+    <script>
+        function calculateBill() {
+            console.log("Calculating bill...");
+
+            let rotaryHours = parseFloat(document.getElementById("rotary").value) || 0;
+            let rotaryMinutes = parseFloat(document.getElementById("rotaryy").value) || 0;
+            let thresherHours = parseFloat(document.getElementById("thresher").value) || 0;
+            let thresherMinutes = parseFloat(document.getElementById("thresherr").value) || 0;
+            let kaltiHours = parseFloat(document.getElementById("kalti").value) || 0;
+            let kaltiMinutes = parseFloat(document.getElementById("kaltii").value) || 0;
+
+            let rotaryTotal = rotaryHours * 1200 + rotaryMinutes * 20;
+            let thresherTotal = thresherHours * 1300 + thresherMinutes * 21.6666;
+            let kaltiTotal = kaltiHours * 1000 + kaltiMinutes * 16.66677;
+
+            let totalBill = rotaryTotal + thresherTotal + kaltiTotal;
+            console.log("Total bill:", totalBill);
+
+            document.getElementById("totelbill").value = totalBill.toFixed(2);
+            alert("Thank you for using the billing app!");
+
+            // Show the additional buttons
+            document.getElementById("additionalButtons").classList.remove("hidden");
+        }
+
+        function getPDF() {
+            // Generate PDF using jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let username = document.getElementById("username").value || "N/A";
+            let rotaryHours = document.getElementById("rotary").value || "0";
+            let rotaryMinutes = document.getElementById("rotaryy").value || "0";
+            let thresherHours = document.getElementById("thresher").value || "0";
+            let thresherMinutes = document.getElementById("thresherr").value || "0";
+            let kaltiHours = document.getElementById("kalti").value || "0";
+            let kaltiMinutes = document.getElementById("kaltii").value || "0";
+            let billAmount = document.getElementById("totelbill").value;
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            function centerText(text, y) {
+                const textWidth = doc.getTextWidth(text);
+                const x = (pageWidth - textWidth) / 2;
+                doc.text(text, x, y);
+            }
+
+            centerText("Bill", 10);
+            centerText("User Name: " + username, 20);
+            centerText("Rotary Hours: " + rotaryHours, 30);
+            centerText("Rotary Minutes: " + rotaryMinutes, 40);
+            centerText("Thresher Hours: " + thresherHours, 50);
+            centerText("Thresher Minutes: " + thresherMinutes, 60);
+            centerText("Kalti Hours: " + kaltiHours, 70);
+            centerText("Kalti Minutes: " + kaltiMinutes, 80);
+            centerText("Total Bill: " + billAmount, 90);
+
+            doc.save("bill.pdf");
+        }
+
+        function shareOnWhatsApp() {
+            let username = document.getElementById("username").value || "N/A";
+            let rotaryHours = document.getElementById("rotary").value || "0";
+            let rotaryMinutes = document.getElementById("rotaryy").value || "0";
+            let thresherHours = document.getElementById("thresher").value || "0";
+            let thresherMinutes = document.getElementById("thresherr").value || "0";
+            let kaltiHours = document.getElementById("kalti").value || "0";
+            let kaltiMinutes = document.getElementById("kaltii").value || "0";
+            let billAmount = document.getElementById("totelbill").value;
+
+            let message = `Your bill details:
+            User Name: ${username}
+            Rotary Hours: ${rotaryHours}
+            Rotary Minutes: ${rotaryMinutes}
+            Thresher Hours: ${thresherHours}
+            Thresher Minutes: ${thresherMinutes}
+            Kalti Hours: ${kaltiHours}
+            Kalti Minutes: ${kaltiMinutes}
+            Total Bill: ${billAmount}`;
+
+            let url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+
+</body>
+
+</html>
